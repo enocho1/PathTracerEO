@@ -115,7 +115,7 @@ inline  vec3 operator *(const vec3& u, double t) {
 }
 
 inline  vec3 operator /(const vec3& u, double t) {
-	return (1 / t) * u;
+	return (1.0 / t) * u;
 }
 
 // dot product of two vectors u and v.

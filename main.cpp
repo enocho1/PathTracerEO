@@ -6,13 +6,49 @@
 
 #include <iostream>
 
+
+
+// again, this should go in its own class
+double hitSphere(const P3D& center, double radius, const ray& r) {
+	// using the following quadratic equation:
+	// ( b^2 )t^2 + ( 2b(A-C) )t + ( (A-C)^2-r^2 ) = 0
+	// we can calculate the params t, if any, at which the ray intersects the sphere
+
+	//variables
+	auto _b = r.direction();
+	auto aMinusc = r.origin() - center;
+
+	//quadratic
+	double a = dot(_b, _b);
+	double b = 2.0 * dot(_b, aMinusc);
+	double c = dot(aMinusc, aMinusc) - radius * radius;
+
+	double discrim = b * b - 4.0 * a * c;
+
+	if (discrim < 0) {
+		return -1.0;
+	}
+	else {
+		return (-b - sqrt(discrim)) / (2.0 * a);
+	}
+
+}
+
 //this really should go inside a separate class
 
 colour rayColour(const ray& r) {
-	double t = 0.5 * (1.0 + r.dir.y());
-	return (1.0 - t) * colour(1, 1, 1) + t * colour(0.5, 1.0, 1.0);
-	//return (1.0 - t) * colour(1, 1, 1) + t * colour(0.0, 0.0, 0.0);
+	//sphere intersection check
+	auto t = hitSphere(P3D(0, 0, -1), 0.5, r);
+	if (t > 0.0) {
+		//normal of a sphere is just the vector from the center to the point in question.
+		V3D normal_vector = normalized(r.at(t) - P3D(0, 0, -1));
+		return 0.5 * colour(normal_vector.x() + 1.0, normal_vector.y() + 1.0, normal_vector.z() + 1.0);
+	}
+
+	t = 0.5 * (1.0 + r.dir.y());
+	return (1.0 - t) * colour(1, 1, 1) + t * colour(1.0, 0.7, 0.4);
 }
+
 
 int main() {
 	// following ray tracing in a weekend. hoping to make something cool. @enoch
@@ -47,8 +83,8 @@ int main() {
 
 			P3D u, v;
 
-			u = (double(i) / (image_width - 1))*horizontal_vec;
-			v = (double(j) / (image_height- 1))*vertical_vec;
+			u = (double(i) / (image_width - 1)) * horizontal_vec;
+			v = (double(j) / (image_height - 1)) * vertical_vec;
 
 			ray r(origin, (top_left + u - v - origin));
 			colour pixel_colour = rayColour(r);

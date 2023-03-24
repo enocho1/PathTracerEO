@@ -132,8 +132,9 @@
   <ItemGroup>
     <ClInclude Include="camera.h" />
     <ClInclude Include="colour.h" />
-    <ClInclude Include="item.h" />
+    <ClInclude Include="primative.h" />
     <ClInclude Include="ray.h" />
+    <ClInclude Include="scene.h" />
     <ClInclude Include="sphere.h" />
     <ClInclude Include="vec3.h" />
   </ItemGroup>

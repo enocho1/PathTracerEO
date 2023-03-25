@@ -1,6 +1,6 @@
 #pragma once
-#ifndef PRIMATIVE_H
-#define PRIMATIVE_H
+#ifndef PRIMITIVE_H
+#define PRIMITIVE_H
 
 #include "ray.h"
 
@@ -11,7 +11,7 @@ struct intersection
 	//where in space did this intersection occur?
 	P3D p;
 	
-	//what is the surface normal to the primative at this point in space?
+	//what is the surface normal to the primitive at this point in space?
 	V3D	normal;
 	
 	//how far along the ray are we? 
@@ -35,10 +35,10 @@ struct intersection
 };
 
 // anything that a ray can intersect
-class primative {
+class primitive {
 public:
 	virtual bool intersect(const ray& r, double t_min, double t_max, intersection& inter) const = 0;
 
 };
-#endif // !PRIMATIVE_H
+#endif // !PRIMITIVE_H
 

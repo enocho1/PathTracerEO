@@ -32,13 +32,16 @@
     <ClInclude Include="camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="primative.h">
+    <ClInclude Include="primitive.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="sphere.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pteo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

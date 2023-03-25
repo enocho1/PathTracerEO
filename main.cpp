@@ -1,6 +1,9 @@
+#include "pteo.h"
+
 #include "colour.h"
-#include "vec3.h"
-#include "ray.h"
+#include "scene.h"
+#include "sphere.h"
+
 // // camera class needs sorting out. @enoch
 // #include "camera.h"
 
@@ -36,29 +39,33 @@ double hitSphere(const P3D& center, double radius, const ray& r) {
 
 //this really should go inside a separate class
 
-colour rayColour(const ray& r) {
-	//sphere intersection check
-	auto t = hitSphere(P3D(0, 0, -1), 0.5, r);
-	if (t > 0.0) {
-		//normal of a sphere is just the vector from the center to the point in question.
-		V3D normal_vector = normalized(r.at(t) - P3D(0, 0, -1));
-		return 0.5 * colour(normal_vector.x() + 1.0, normal_vector.y() + 1.0, normal_vector.z() + 1.0);
+colour rayColour(const ray& r, const primitive& sc) {
+	//scene intersection check
+	intersection intersection_info;
+	if (sc.intersect(r, 0, infinity, intersection_info)) {
+		return 0.5 * (intersection_info.normal + colour(1, 1, 1));
 	}
-
-	t = 0.5 * (1.0 + r.dir.y());
+	auto t = 0.5 * (1.0 + r.dir.y());
 	return (1.0 - t) * colour(1, 1, 1) + t * colour(1.0, 0.7, 0.4);
 }
 
 
 int main() {
 	// following ray tracing in a weekend. hoping to make something cool. @enoch
-	// also, Pixar, DreamWorks, Disney, anyone else, please hire meeeeeeee!! @enoch.
+	// also: Pixar, DreamWorks, Disney, anyone else, please hire meeeeeeee!! @enoch.
 
 	// image
 	const double aspect_ratio = 16.0 / 9.0;
 	const int image_width = 400;
 	const int image_height = static_cast<int>(image_width / aspect_ratio);
 
+	//scene setup [wanna put that in a separate class too!]
+
+	scene everything;
+	everything.add(make_shared<sphere>(P3D(0, 0, -1), 0.5));
+	everything.add(make_shared<sphere>(P3D(0.5, 0.2, -0.5), 0.2));
+	everything.add(make_shared<sphere>(P3D(0, -100.5, -1), 100));
+	
 	// camera
 
 	double view_height = 2.0;
@@ -77,7 +84,6 @@ int main() {
 
 	for (int j = 0; j < image_height; j++) {
 
-		std::cerr << "\r writing line: " << j << "/256..." << std::flush;
 
 		for (int i = 0; i < image_width; i++) {
 
@@ -87,13 +93,15 @@ int main() {
 			v = (double(j) / (image_height - 1)) * vertical_vec;
 
 			ray r(origin, (top_left + u - v - origin));
-			colour pixel_colour = rayColour(r);
+			colour pixel_colour = rayColour(r, everything);
 
 			// colour pixel_colour(double(i) / (image_width - 1), double(255 - j) / (image_height - 1), 0.3);
 
 			writeColour(std::cout, pixel_colour);
 
 		}
+		//progress
+		std::cerr << "\r PTEO rendering image... " << static_cast<int>(100 * (double)j / (image_height - 1)) << "%" << std::flush;
 	}
 
 	std::cerr << "\n done :)\n";

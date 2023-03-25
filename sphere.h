@@ -3,9 +3,9 @@
 #define SPHERE_H
 
 #include "vec3.h"
-#include "primative.h"
+#include "primitive.h"
 
-class sphere : public primative {
+class sphere : public primitive {
 public:
 	sphere() : centre(P3D()), radius(0) {}
 	sphere(P3D c, double r):centre(c), radius(r) {}

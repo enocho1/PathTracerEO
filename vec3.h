@@ -27,12 +27,12 @@ public:
 	// accessing by index
 	double& operator[](int i) { return e[i]; }
 	double operator[](int i) const { return e[i]; }
-	
+
 	// negation
 	vec3 operator-() const { return vec3(-e[0], -e[1], -e[2]); }
 
 	// math
-	vec3& operator +=(const vec3 &v) {
+	vec3& operator +=(const vec3& v) {
 		e[0] += v[0];
 		e[1] += v[1];
 		e[2] += v[2];
@@ -51,7 +51,7 @@ public:
 
 	vec3& operator /=(const double t) {
 
-		return *this *=1/t;
+		return *this *= 1 / t;
 	}
 
 	// returns the length of the vector squared;
@@ -84,6 +84,16 @@ public:
 	// member variables
 private:
 	double e[3];
+
+	//static stuff
+public:
+	inline static vec3 random() {
+		return vec3(rando(), rando(), rando());
+	}
+
+	inline static vec3 random(double start_range, double end_range) {
+		return vec3(rando(start_range, end_range), rando(start_range, end_range), rando(start_range, end_range));
+	}
 };
 
 
@@ -132,7 +142,19 @@ inline vec3 cross(const vec3& u, const vec3& v) {
 
 // returns a normalised copy of the vector (length 1)
 inline vec3 normalized(vec3 v) {
-	return v/v.norm();
+	return v / v.norm();
+}
+
+inline vec3 randomBounce() {
+	for (int i = 0; i < 20; i++) {
+		auto p = vec3::random(-1, 1);
+		if (p.length_squared() < 1) {
+			return p;
+		}
+	}
+	//give up if it's taking too long
+	return vec3::random(0.577, 0.577);
+
 }
 
 //some aliases for vec3 [for code readability] i think. @enoch

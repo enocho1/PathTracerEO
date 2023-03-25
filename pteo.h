@@ -5,6 +5,7 @@
 #include <cmath>
 #include <limits>
 #include <memory>
+#include <cstdlib>
 
 //using
 
@@ -39,13 +40,13 @@ inline double rando(double start_range, double end_range) {
 
 //clamp within range
 inline double clamp(double x, double start_range, double end_range) {
-	return std::max(std::min(x, end_range), start_range);
+	//return std::max(std::min(x, end_range), start_range);
 	
-	//// alternative implementation from ray tracing in a weekend
-	//// maybe it's faster idk, 
-	//if (x < start_range) return start_range;
-	//if (x > end_range) return end_range;
-	//return x;
+	// alternative implementation from ray tracing in a weekend
+	// maybe it's faster idk, 
+	if (x < start_range) return start_range;
+	if (x > end_range) return end_range;
+	return x;
 }
 
 

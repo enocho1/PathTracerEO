@@ -5,48 +5,27 @@
 #include "sphere.h"
 
 // // camera class needs sorting out. @enoch
- #include "camera.h"
+#include "camera.h"
 
 #include <iostream>
 
 
 
-// again, this should go in its own class
-double hitSphere(const P3D& center, double radius, const ray& r) {
-	// using the following quadratic equation:
-	// ( b^2 )t^2 + ( 2b(A-C) )t + ( (A-C)^2-r^2 ) = 0
-	// we can calculate the params t, if any, at which the ray intersects the sphere
-
-	//variables
-	auto _b = r.direction();
-	auto aMinusc = r.origin() - center;
-
-	//quadratic
-	double a = dot(_b, _b);
-	double b = 2.0 * dot(_b, aMinusc);
-	double c = dot(aMinusc, aMinusc) - radius * radius;
-
-	double discrim = b * b - 4.0 * a * c;
-
-	if (discrim < 0) {
-		return -1.0;
-	}
-	else {
-		return (-b - sqrt(discrim)) / (2.0 * a);
-	}
-
-}
-
 //this really should go inside a separate class
 
-colour rayColour(const ray& r, const primitive& sc) {
+colour rayColour(const ray& r, const primitive& sc, int depth) {
+	if (depth <= 0) return colour(0, 0, 0);
+	
 	//scene intersection check
 	intersection intersection_info;
 	if (sc.intersect(r, 0, infinity, intersection_info)) {
-		return 0.5 * (intersection_info.normal + colour(1, 1, 1));
+		//diffuse reflection
+		P3D target = intersection_info.p + intersection_info.normal + randomBounce();
+		//return 0.5 * (intersection_info.normal + colour(1, 1, 1));
+		return 0.5 * rayColour(ray(intersection_info.p, target - intersection_info.p), sc, depth - 1);
 	}
 	auto t = 0.5 * (1.0 + r.dir.y());
-	return (1.0 - t) * colour(1, 1, 1) + t * colour(1.0, 0.7, 0.4);
+	return (1.0 - t) * colour(1, 1, 1) + t * colour(0.5, 0.7, 1.0);
 }
 
 
@@ -58,16 +37,17 @@ int main() {
 	const double aspect_ratio = 16.0 / 9.0;
 	const int image_width = 400;
 	const int image_height = static_cast<int>(image_width / aspect_ratio);
-	const int n_samples = 1;
+	const int n_samples = 100;
+	const int max_depth = 50;
 
 	//scene setup [wanna put that in a separate class too!]
 
 	scene everything;
 	everything.add(make_shared<sphere>(P3D(0, 0, -1), 0.5));
 	everything.add(make_shared<sphere>(P3D(0, -100.5, -1), 100));
-	
+
 	// camera
-	
+
 	camera cam;
 
 	// render
@@ -85,9 +65,9 @@ int main() {
 				u = (i + rando()) / (image_width - 1);
 				v = (j + rando()) / (image_height - 1);
 				ray r = cam.getRay(u, v);
-				pixel_colour += rayColour(r, everything);
+				pixel_colour += rayColour(r, everything, max_depth);
 			}
-			
+
 
 			writeColour(std::cout, pixel_colour, n_samples);
 

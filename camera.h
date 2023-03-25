@@ -20,7 +20,9 @@ public:
 		top_left = origin - (horizontal_vec / 2) + (vertical_vec / 2) - V3D(0, 0, focal_length);
 	}
 
-	// i'll finish this up later. @enoch
+	ray getRay(double u, double v) const {
+		return ray(origin, (top_left + u * horizontal_vec - v * vertical_vec - origin));
+	}
 private:
 	P3D origin;
 	V3D horizontal_vec;

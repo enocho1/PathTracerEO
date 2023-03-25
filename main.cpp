@@ -5,7 +5,7 @@
 #include "sphere.h"
 
 // // camera class needs sorting out. @enoch
-// #include "camera.h"
+ #include "camera.h"
 
 #include <iostream>
 
@@ -58,24 +58,17 @@ int main() {
 	const double aspect_ratio = 16.0 / 9.0;
 	const int image_width = 400;
 	const int image_height = static_cast<int>(image_width / aspect_ratio);
+	const int n_samples = 1;
 
 	//scene setup [wanna put that in a separate class too!]
 
 	scene everything;
 	everything.add(make_shared<sphere>(P3D(0, 0, -1), 0.5));
-	everything.add(make_shared<sphere>(P3D(0.5, 0.2, -0.5), 0.2));
 	everything.add(make_shared<sphere>(P3D(0, -100.5, -1), 100));
 	
 	// camera
-
-	double view_height = 2.0;
-	double view_width = view_height * aspect_ratio;
-	double focal_length = 1.0;
-
-	P3D origin(0, 0, 0);
-	V3D horizontal_vec(view_width, 0, 0);
-	V3D vertical_vec(0, view_height, 0);
-	P3D top_left = origin - (horizontal_vec / 2) + (vertical_vec / 2) - V3D(0, 0, focal_length);
+	
+	camera cam;
 
 	// render
 
@@ -83,21 +76,20 @@ int main() {
 
 
 	for (int j = 0; j < image_height; j++) {
-
-
 		for (int i = 0; i < image_width; i++) {
 
-			P3D u, v;
+			//sampling for antialiasing
+			colour pixel_colour(0, 0, 0);
+			for (int s = 0; s < n_samples; s++) {
+				double u, v;
+				u = (i + rando()) / (image_width - 1);
+				v = (j + rando()) / (image_height - 1);
+				ray r = cam.getRay(u, v);
+				pixel_colour += rayColour(r, everything);
+			}
+			
 
-			u = (double(i) / (image_width - 1)) * horizontal_vec;
-			v = (double(j) / (image_height - 1)) * vertical_vec;
-
-			ray r(origin, (top_left + u - v - origin));
-			colour pixel_colour = rayColour(r, everything);
-
-			// colour pixel_colour(double(i) / (image_width - 1), double(255 - j) / (image_height - 1), 0.3);
-
-			writeColour(std::cout, pixel_colour);
+			writeColour(std::cout, pixel_colour, n_samples);
 
 		}
 		//progress
